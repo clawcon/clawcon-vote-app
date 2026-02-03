@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
       : [];
     const links = rawLinks
       .map((link: string) => link.trim())
-      .filter((link) => link.startsWith("http://") || link.startsWith("https://"));
+      .filter(
+        (link: string) =>
+          link.startsWith("http://") || link.startsWith("https://")
+      );
 
     const submissionType =
       payload.submission_type === "topic" ? "topic" : "speaker_demo";
