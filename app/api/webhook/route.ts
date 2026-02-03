@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
+// Rate limiting per API key (resets on deploy)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX = 20; // 20 submissions per hour per API key
+
+function isRateLimited(key: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  entry.count++;
+  return false;
+}
+
 function sanitizeLink(link: string): string | null {
   try {
     const url = new URL(link);
@@ -71,6 +93,14 @@ export async function POST(request: NextRequest) {
 
     if (!apiKey || !keyRow?.email) {
       return NextResponse.json({ error: "Invalid bot API key." }, { status: 401 });
+    }
+
+    // Rate limit by API key
+    if (isRateLimited(apiKey)) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Max 20 submissions per hour." },
+        { status: 429 }
+      );
     }
 
     const { error } = await supabaseAdmin.from("submissions").insert({

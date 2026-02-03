@@ -5,7 +5,15 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../../lib/supabaseClient";
-import type { Comment, Submission } from "../../../lib/types";
+import type { Submission } from "../../../lib/types";
+
+interface Comment {
+  id: string;
+  submission_id: string;
+  author_display_name: string | null;
+  content: string;
+  created_at: string;
+}
 import { getDomain, timeAgo } from "../../../lib/utils";
 
 export default function PostPage() {
@@ -41,7 +49,7 @@ export default function PostPage() {
   const fetchComments = useCallback(async () => {
     const { data, error } = await supabase
       .from("comments")
-      .select("*")
+      .select("id, submission_id, author_display_name, content, created_at")
       .eq("submission_id", postId)
       .order("created_at", { ascending: true });
 
@@ -362,7 +370,7 @@ export default function PostPage() {
                 <div key={comment.id} className="post-comment">
                   <div className="post-comment-meta">
                     <span className="post-comment-author">
-                      {comment.author_email?.split("@")[0] || "anon"}
+                      {comment.author_display_name || "anon"}
                     </span>
                     <span className="post-comment-time">
                       {timeAgo(comment.created_at)}
