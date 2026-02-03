@@ -54,6 +54,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const apiKey = request.headers.get("x-api-key") || "";
+    const { data: keyRow } = await supabaseAdmin
+      .from("bot_keys")
+      .select("email")
+      .eq("api_key", apiKey)
+      .maybeSingle();
+
+    if (!apiKey || !keyRow?.email) {
+      return NextResponse.json({ error: "Invalid bot API key." }, { status: 401 });
+    }
+
     const { error } = await supabaseAdmin.from("submissions").insert({
       title,
       description,

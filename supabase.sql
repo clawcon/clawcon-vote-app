@@ -23,8 +23,16 @@ create table if not exists public.votes (
   unique (submission_id, user_id)
 );
 
+create table if not exists public.bot_keys (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  api_key text not null unique,
+  created_at timestamptz not null default now()
+);
+
 alter table public.submissions enable row level security;
 alter table public.votes enable row level security;
+alter table public.bot_keys enable row level security;
 
 create policy "Public can read submissions" on public.submissions
   for select using (true);
@@ -36,6 +44,9 @@ create policy "Authenticated can insert submissions" on public.submissions
 create policy "Authenticated can insert votes" on public.votes
   for insert to authenticated
   with check (auth.uid() = user_id);
+
+create policy "No direct access to bot keys" on public.bot_keys
+  for all using (false);
 
 create policy "Authenticated can read own votes" on public.votes
   for select to authenticated

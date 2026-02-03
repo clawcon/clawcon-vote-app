@@ -1,0 +1,40 @@
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import crypto from "crypto";
+
+export async function POST(request: NextRequest) {
+  try {
+    const payload = await request.json();
+    const email =
+      typeof payload.email === "string" ? payload.email.trim().toLowerCase() : "";
+
+    if (!email || !email.includes("@")) {
+      return NextResponse.json({ error: "Valid email required." }, { status: 400 });
+    }
+
+    const { data: existing } = await supabaseAdmin
+      .from("bot_keys")
+      .select("api_key")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existing?.api_key) {
+      return NextResponse.json({ api_key: existing.api_key });
+    }
+
+    const apiKey = crypto.randomBytes(24).toString("hex");
+
+    const { error } = await supabaseAdmin.from("bot_keys").insert({
+      email,
+      api_key: apiKey
+    });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ api_key: apiKey });
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+  }
+}

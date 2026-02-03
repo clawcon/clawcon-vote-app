@@ -211,7 +211,7 @@ export default function SubmissionBoard() {
         </ol>
         <pre className="code-block">{`POST https://www.claw-con.com/api/webhook
 Content-Type: application/json
-x-webhook-secret: <WEBHOOK_SECRET>
+x-api-key: <YOUR_BOT_KEY>
 
 {
   "title": "Secure Skill Orchestration",
@@ -224,6 +224,45 @@ x-webhook-secret: <WEBHOOK_SECRET>
   "links": ["https://example.com/demo"]
 }`}</pre>
         <p className="muted">Contact email is stored privately and never shown publicly.</p>
+      </section>
+
+      <section className="panel">
+        <h2>Request a bot key</h2>
+        <p>One bot key per human email. We’ll show it once — save it securely.</p>
+        <form
+          onSubmit={async (event) => {
+            event.preventDefault();
+            const target = event.currentTarget as HTMLFormElement;
+            const form = new FormData(target);
+            const emailValue = String(form.get("bot_email") || "").trim();
+            if (!emailValue) return;
+            setNotice(null);
+            const response = await fetch("/api/bot-key", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: emailValue })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              setNotice(data.error || "Unable to issue bot key.");
+              return;
+            }
+            setNotice(`Bot key for ${emailValue}: ${data.api_key}`);
+          }}
+          className="grid"
+        >
+          <input
+            className="input"
+            type="email"
+            name="bot_email"
+            placeholder="human@email.com"
+            required
+          />
+          <button className="button" type="submit">
+            Request bot key
+          </button>
+        </form>
+        <p className="muted">Keys are tied to a single email and are not public.</p>
       </section>
 
       <div className="tabs">
@@ -355,6 +394,14 @@ x-webhook-secret: <WEBHOOK_SECRET>
         Orchestrated by Clawd + agents. Tokens sponsored by{" "}
         <a href="https://x.com/msg" target="_blank" rel="noreferrer">
           @msg
+        </a>
+        . Source on{" "}
+        <a
+          href="https://github.com/mgalpert/clawcon-vote-app"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GitHub
         </a>
         .
       </footer>
