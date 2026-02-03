@@ -430,7 +430,7 @@ export default function SubmissionBoard() {
             )}
             <p className="hn-tip">
               {activeTab === "speaker_demo"
-                ? "Open source projects get priority! 🌟 OpenClaw contributors get +1000 points 🦞"
+                ? <>Open source projects get priority! 🌟<br />OpenClaw contributors get +1000 points 🦞</>
                 : "Lead a discussion on any of these or propose your own."}
             </p>
           </div>
