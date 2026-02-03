@@ -1,52 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
-
-function sanitizeLink(link: string): string | null {
-  try {
-    const url = new URL(link);
-    if (url.protocol !== "https:") return null;
-    if (url.username || url.password) return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
-
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return "";
-  }
-}
-
-function timeAgo(date: string): string {
-  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  const days = Math.floor(hours / 24);
-  return `${days} day${days === 1 ? "" : "s"} ago`;
-}
-
-interface Submission {
-  id: string;
-  title: string;
-  description: string;
-  presenter_name: string;
-  links: string[] | null;
-  vote_count: number;
-  submission_type: "speaker_demo" | "topic";
-  submitted_by: "human" | "bot" | "bot_on_behalf";
-  submitted_for_name: string | null;
-  is_openclaw_contributor: boolean;
-  created_at?: string;
-}
+import type { Submission } from "../lib/types";
+import { sanitizeLink, getDomain, timeAgo } from "../lib/utils";
 
 export default function SubmissionBoard() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -63,7 +22,6 @@ export default function SubmissionBoard() {
   const [activeTab, setActiveTab] = useState<"speaker_demo" | "topic">("speaker_demo");
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [displayCount, setDisplayCount] = useState(30);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const userEmail = session?.user?.email ?? null;
@@ -312,91 +270,58 @@ export default function SubmissionBoard() {
                 visibleSubmissions.map((submission, index) => {
                   const primaryLink = submission.links?.[0];
                   const domain = primaryLink ? getDomain(primaryLink) : null;
-                  const isExpanded = expandedId === submission.id;
 
                   return (
-                    <>
-                      <tr key={submission.id} className="hn-row">
-                        <td className="hn-rank">{index + 1}.</td>
-                        <td className="hn-vote">
-                          <button
-                            className="hn-upvote"
-                            onClick={() => handleVote(submission.id)}
-                            disabled={voteLoading === submission.id}
-                            title="upvote"
-                          >
-                            ▲
-                          </button>
-                        </td>
-                        <td className="hn-content">
-                          <div className="hn-title-row">
-                            {primaryLink ? (
-                              <a href={primaryLink} target="_blank" rel="noreferrer" className="hn-title">
-                                {submission.title}
-                              </a>
-                            ) : (
-                              <span className="hn-title">{submission.title}</span>
-                            )}
-                            {domain && (
-                              <span className="hn-domain">({domain})</span>
-                            )}
-                            {submission.is_openclaw_contributor && (
-                              <span className="hn-badge contributor" title="OpenClaw Contributor">🦞</span>
-                            )}
-                            {submission.links?.some((l) => l.includes("github.com")) && (
-                              <span className="hn-badge oss" title="Open Source">⭐</span>
-                            )}
-                          </div>
-                          <div className="hn-meta">
-                            <span className="hn-points">{submission.vote_count} point{submission.vote_count !== 1 ? "s" : ""}</span>
-                            {" by "}
-                            <span className="hn-presenter">{submission.presenter_name}</span>
-                            {submission.created_at && (
-                              <>
-                                {" "}
-                                <span className="hn-time">{timeAgo(submission.created_at)}</span>
-                              </>
-                            )}
-                            {" | "}
-                            <button
-                              className="hn-link"
-                              onClick={() => setExpandedId(isExpanded ? null : submission.id)}
-                            >
-                              {isExpanded ? "hide" : "details"}
-                            </button>
-                            {submission.links && submission.links.length > 1 && (
-                              <>
-                                {" | "}
-                                <span className="hn-links-count">{submission.links.length} links</span>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                      {isExpanded && (
-                        <tr key={`${submission.id}-expanded`} className="hn-expanded-row">
-                          <td></td>
-                          <td></td>
-                          <td className="hn-expanded-content">
-                            <p className="hn-description">{submission.description}</p>
-                            {submission.links && submission.links.length > 0 && (
-                              <div className="hn-links-list">
-                                {submission.links.map((link) => (
-                                  <a key={link} href={link} target="_blank" rel="noreferrer" className="hn-link-item">
-                                    {link.replace(/^https?:\/\//, "")}
-                                  </a>
-                                ))}
-                              </div>
-                            )}
-                            <p className="hn-submitted-by">
-                              {submission.submitted_by === "bot_on_behalf"
-                                ? `Submitted by bot on behalf of ${submission.submitted_for_name || "someone"}`
-                                : `Submitted by ${submission.submitted_by}`}
-                            </p>
-                          </td>
-                        </tr>
-                      )}
-                    </>
+                    <tr key={submission.id} className="hn-row">
+                      <td className="hn-rank">{index + 1}.</td>
+                      <td className="hn-vote">
+                        <button
+                          className="hn-upvote"
+                          onClick={() => handleVote(submission.id)}
+                          disabled={voteLoading === submission.id}
+                          title="upvote"
+                        >
+                          ▲
+                        </button>
+                      </td>
+                      <td className="hn-content">
+                        <div className="hn-title-row">
+                          <Link href={`/post/${submission.id}`} className="hn-title">
+                            {submission.title}
+                          </Link>
+                          {domain && (
+                            <span className="hn-domain">({domain})</span>
+                          )}
+                          {submission.is_openclaw_contributor && (
+                            <span className="hn-badge contributor" title="OpenClaw Contributor">🦞</span>
+                          )}
+                          {submission.links?.some((l) => l.includes("github.com")) && (
+                            <span className="hn-badge oss" title="Open Source">⭐</span>
+                          )}
+                        </div>
+                        <div className="hn-meta">
+                          <span className="hn-points">{submission.vote_count} point{submission.vote_count !== 1 ? "s" : ""}</span>
+                          {" by "}
+                          <span className="hn-presenter">{submission.presenter_name}</span>
+                          {submission.created_at && (
+                            <>
+                              {" "}
+                              <span className="hn-time">{timeAgo(submission.created_at)}</span>
+                            </>
+                          )}
+                          {" | "}
+                          <Link href={`/post/${submission.id}`} className="hn-link">
+                            {submission.comment_count || 0} comment{(submission.comment_count || 0) === 1 ? "" : "s"}
+                          </Link>
+                          {submission.links && submission.links.length > 1 && (
+                            <>
+                              {" | "}
+                              <span className="hn-links-count">{submission.links.length} links</span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })
               )}
