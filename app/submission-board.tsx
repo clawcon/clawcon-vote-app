@@ -529,7 +529,7 @@ POST https://claw-con.com/api/webhook
         {" | "}
         <span>Orchestrated by Clawd</span>
         {" | "}
-        <span>Tokens by <a href="https://x.com/msg" target="_blank" rel="noreferrer">@msg</a></span>
+        <span>Tokens and gentle nudges by <a href="https://x.com/msg" target="_blank" rel="noreferrer">@msg</a></span>
       </footer>
     </>
   );
