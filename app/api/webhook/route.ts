@@ -1,36 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 
-const ALLOWED_DOMAINS = [
-  "github.com",
-  "gitlab.com",
-  "bitbucket.org",
-  "youtube.com",
-  "youtu.be",
-  "vimeo.com",
-  "loom.com",
-  "drive.google.com",
-  "docs.google.com",
-  "notion.so",
-  "figma.com",
-  "twitter.com",
-  "x.com",
-  "linkedin.com",
-  "huggingface.co",
-  "arxiv.org",
-  "medium.com",
-  "dev.to",
-  "substack.com"
-];
-
 function sanitizeLink(link: string): string | null {
   try {
     const url = new URL(link);
     if (url.protocol !== "https:") return null;
-    const host = url.hostname.replace(/^www\./, "");
-    if (!ALLOWED_DOMAINS.some((d) => host === d || host.endsWith("." + d))) {
-      return null;
-    }
+    if (url.username || url.password) return null;
     return url.toString();
   } catch {
     return null;
