@@ -100,7 +100,7 @@ export default function PostPage() {
       setNotice(error.message);
       return;
     }
-    setNotice("Check your inbox for your sign-in link ✨");
+    setNotice("Check your inbox for your sign-in link ✨ (check spam if you don't see it!)");
     setShowSignInModal(false);
   };
 
