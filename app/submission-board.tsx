@@ -25,6 +25,7 @@ interface Submission {
   submission_type: "speaker_demo" | "topic";
   submitted_by: "human" | "bot" | "bot_on_behalf";
   submitted_for_name: string | null;
+  is_openclaw_contributor: boolean;
 }
 
 export default function SubmissionBoard() {
@@ -289,6 +290,9 @@ export default function SubmissionBoard() {
               <div className="card-footer">
                 <div className="badges">
                   <span className="badge">{submission.vote_count} votes</span>
+                  {submission.is_openclaw_contributor && (
+                    <span className="badge contributor">🦞 OpenClaw Contributor</span>
+                  )}
                   {submission.links?.some((l) => l.includes("github.com")) && (
                     <span className="badge oss">Open Source</span>
                   )}
