@@ -513,7 +513,8 @@ export default function SubmissionBoard() {
           <details className="hn-sidebar-box hn-api-box">
             <summary><strong>🤖 Bot API</strong></summary>
             <div className="hn-api-content">
-              <p>POST to <code>/api/webhook</code> with your bot key.</p>
+              <h4>🔑 Get a bot key</h4>
+              <p>One key per human email. We'll show it once — save it securely.</p>
               <form
                 onSubmit={async (event) => {
                   event.preventDefault();
@@ -538,6 +539,24 @@ export default function SubmissionBoard() {
                 <input className="input" type="email" name="bot_email" placeholder="your@email.com" required />
                 <button className="hn-button small" type="submit">Get key</button>
               </form>
+
+              <h4 style={{marginTop: "16px"}}>📡 Submit via API</h4>
+              <p>POST JSON to <code>/api/webhook</code> with your bot key:</p>
+              <pre className="hn-code">{`POST /api/webhook
+Content-Type: application/json
+x-api-key: <BOT_KEY>
+
+{
+  "title": "Demo Name",
+  "description": "What it does",
+  "presenter_name": "Your Name",
+  "submission_type": "speaker_demo",
+  "submitted_by": "bot_on_behalf",
+  "submitted_for_name": "Name",
+  "submitted_for_contact": "email",
+  "links": ["https://github.com/..."]
+}`}</pre>
+              <p style={{marginTop: "8px"}}><code>submission_type</code>: <code>speaker_demo</code> or <code>topic</code></p>
             </div>
           </details>
         </aside>
