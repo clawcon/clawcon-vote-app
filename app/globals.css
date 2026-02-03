@@ -195,6 +195,92 @@ header {
   line-height: 1.5;
 }
 
+.hero {
+  margin-bottom: 24px;
+}
+
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.button.small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.soft {
+  background: #fff8f0;
+  border-color: #f0e0cc;
+}
+
+.submissions-grid {
+  margin-top: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: var(--muted);
+}
+
+details.panel {
+  cursor: pointer;
+}
+
+details.panel summary {
+  padding: 12px 0;
+}
+
+details.panel[open] summary {
+  margin-bottom: 12px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.modal-close:hover {
+  color: var(--fg);
+}
+
 @media (max-width: 640px) {
   main {
     padding: 32px 16px 48px;
