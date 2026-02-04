@@ -139,13 +139,11 @@ export default function SponsorsPage() {
               transition: "background 0.2s, border-color 0.2s, transform 0.2s",
             }}
             onMouseEnter={(e) => {
-              // @ts-expect-error direct style mutation for hover
               e.currentTarget.style.background = "rgba(255,255,255,0.07)";
               e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              // @ts-expect-error direct style mutation for hover
               e.currentTarget.style.background = "rgba(255,255,255,0.035)";
               e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
               e.currentTarget.style.transform = "translateY(0)";
