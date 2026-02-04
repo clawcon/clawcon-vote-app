@@ -350,6 +350,14 @@ export default function SubmissionBoard() {
             <a href="/youarehere" className="hn-nav-link">
               you are here
             </a>
+            <span className="hn-nav-sep">|</span>
+            <a href="https://t.me/clawcon" target="_blank" rel="noreferrer" className="hn-nav-link">
+              join telegram
+            </a>
+            <span className="hn-nav-sep">|</span>
+            <a href="https://discord.gg/hhSCBayj" target="_blank" rel="noreferrer" className="hn-nav-link">
+              openclaw discord
+            </a>
           </nav>
           {userEmail && (
             <div className="hn-user">
