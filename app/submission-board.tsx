@@ -138,104 +138,23 @@ export default function SubmissionBoard() {
 
   const handleMagicLink = async (event: React.FormEvent) => {
     event.preventDefault();
-    setNotice(null);
-    if (isBlockedEmail(email)) {
-      setNotice("Disposable email addresses are not allowed. Please use a real email.");
-      return;
-    }
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-      }
-    });
-    setLoading(false);
-    if (error) {
-      setNotice(error.message);
-      return;
-    }
-    setNotice("Check your inbox for your sign-in link ✨ (check spam if you don't see it!)");
-    setShowSignInModal(false);
+    setNotice("Sign-up is currently disabled. Thanks for attending ClawCon! 🦞");
+    return;
   };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
-  const handleVote = async (submissionId: string) => {
-    if (!session) {
-      setShowSignInModal(true);
-      return;
-    }
-    if (session.user?.email && isBlockedEmail(session.user.email)) {
-      setNotice("Your account has been restricted.");
-      return;
-    }
-    setNotice(null);
-    setVoteLoading(submissionId);
-    const { error } = await supabase.from("votes").insert({
-      submission_id: submissionId
-    });
-    setVoteLoading(null);
-    if (error) {
-      if (error.code === "23505") {
-        setNotice("You've already voted for this one.");
-      } else {
-        setNotice(error.message);
-      }
-      return;
-    }
-    fetchSubmissions();
+  const handleVote = async (_submissionId: string) => {
+    setNotice("Voting is currently disabled. Thanks for attending ClawCon! 🦞");
+    return;
   };
 
   const handleSubmission = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!session) {
-      setShowSignInModal(true);
-      return;
-    }
-    if (session.user?.email && isBlockedEmail(session.user.email)) {
-      setNotice("Your account has been restricted.");
-      return;
-    }
-    setNotice(null);
-    setSubmitLoading(true);
-    const rawLinks = formLinks
-      .split(",")
-      .map((link) => link.trim())
-      .filter(Boolean);
-    const links = rawLinks.map((l) => sanitizeLink(l)).filter((l): l is string => l !== null);
-
-    if (rawLinks.length > 0 && links.length === 0) {
-      setNotice("Links must be valid https:// URLs");
-      setSubmitLoading(false);
-      return;
-    }
-
-    const presenterValue = formPresenter || (activeTab === "topic" ? "Community" : "");
-
-    const { error } = await supabase.from("submissions").insert({
-      title: formTitle,
-      description: formDescription,
-      presenter_name: presenterValue,
-      links: links.length > 0 ? links : null,
-      submission_type: activeTab,
-      submitted_by: "human"
-    });
-
-    setSubmitLoading(false);
-    if (error) {
-      setNotice(error.message);
-      return;
-    }
-
-    setFormTitle("");
-    setFormDescription("");
-    setFormPresenter("");
-    setFormLinks("");
-    setNotice("Submission received! 🎉");
-    fetchSubmissions();
+    setNotice("Submissions are currently disabled. Thanks for attending ClawCon! 🦞");
+    return;
   };
 
   const handleBotKeyReveal = async () => {
