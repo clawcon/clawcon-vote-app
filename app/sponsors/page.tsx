@@ -16,6 +16,7 @@ const sponsors = [
   { name: "DigitalOcean", contribution: "Drinks", logo: "/sponsors/digitalocean.svg", url: "https://www.digitalocean.com/", invert: false },
   { name: "Rippling", contribution: "Lobster Plushies", logo: "/sponsors/rippling.svg", url: "https://www.rippling.com/", invert: true },
   { name: "Dabl Club", contribution: "Event Support", logo: "/sponsors/dabl.svg", url: "https://dabl.club", invert: false },
+  { name: "Love Haight Computers", contribution: "Mac Mini Giveaway", logo: "/sponsors/lovehaight.jpg", url: "https://www.lovehaightcomputers.com/", invert: false },
 ];
 
 export const metadata = {
