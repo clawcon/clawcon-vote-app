@@ -1,8 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 
 const sponsors = [
-  { name: "Frontier Tower", contribution: "Venue", logo: "/sponsors/frontiertower.png", url: "https://frontiertower.io", invert: false, isPng: true },
+  { name: "Frontier Tower", contribution: "Venue", logo: "/sponsors/frontiertower.png", url: "https://frontiertower.io", invert: false },
   { name: "Amazon AGI Labs", contribution: "Project Sponsor", logo: "/sponsors/amazon.svg", url: "https://labs.amazon.science/", invert: true },
   { name: "Bee", contribution: "Lobster Rolls", logo: "/sponsors/bee.svg", url: "https://www.bee.computer/", invert: false },
   { name: "Convex", contribution: "Pizza", logo: "/sponsors/convex.svg", url: "https://convex.dev", invert: false },
@@ -26,189 +25,71 @@ export const metadata = {
 
 export default function SponsorsPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#0b0b12", fontFamily: "'Inter', -apple-system, system-ui, sans-serif" }}>
-      {/* Header bar matching main site */}
-      <header
-        style={{
-          background: "#ff6600",
-          padding: "4px 8px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-        }}
-      >
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            fontWeight: "bold",
-            textDecoration: "none",
-            color: "#000",
-            fontFamily: "Verdana, Geneva, sans-serif",
-            fontSize: "11pt",
-          }}
-        >
-          <span style={{ fontSize: "14pt" }}>🦞</span>
-          <span>Claw Con</span>
-        </Link>
-        <Link
-          href="/"
-          style={{
-            color: "#000",
-            textDecoration: "none",
-            fontFamily: "Verdana, Geneva, sans-serif",
-            fontSize: "10pt",
-          }}
-        >
-          submissions
-        </Link>
-        <span style={{ color: "#000", fontFamily: "Verdana, Geneva, sans-serif", fontSize: "10pt" }}>|</span>
-        <span
-          style={{
-            color: "#fff",
-            fontWeight: "bold",
-            fontFamily: "Verdana, Geneva, sans-serif",
-            fontSize: "10pt",
-          }}
-        >
-          sponsors
-        </span>
-      </header>
+    <>
+      <style>{`
+        .sp-body { min-height: 100vh; background: #0b0b12; font-family: 'Inter', -apple-system, system-ui, sans-serif; }
+        .sp-header { background: #ff6600; padding: 4px 8px; display: flex; align-items: center; gap: 12px; }
+        .sp-header a, .sp-header span { font-family: Verdana, Geneva, sans-serif; text-decoration: none; color: #000; }
+        .sp-logo { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 11pt; }
+        .sp-nav-link { font-size: 10pt; }
+        .sp-nav-active { color: #fff !important; font-weight: bold; font-size: 10pt; }
+        .sp-hero { text-align: center; padding: 60px 24px 40px; }
+        .sp-emoji { font-size: 56px; margin-bottom: 8px; }
+        .sp-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: -1.5px; background: linear-gradient(135deg, #ff6b5a 0%, #ff4530 50%, #ff6b5a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.15; margin: 0 0 12px; }
+        .sp-subtitle { font-size: 18px; font-weight: 500; color: rgba(255,255,255,0.4); letter-spacing: 6px; text-transform: uppercase; margin: 0; }
+        .sp-grid { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .sp-card { background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 16px 20px; min-height: 160px; text-decoration: none; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+        .sp-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .sp-logo-wrap { width: 160px; height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+        .sp-logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .sp-logo-wrap img.invert { filter: brightness(0) invert(1); opacity: 0.85; }
+        .sp-logo-wrap img.white { opacity: 0.9; }
+        .sp-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7); text-align: center; }
+        .sp-contrib { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; text-align: center; }
+        .sp-footer { text-align: center; padding: 24px; font-size: 13px; color: rgba(255,255,255,0.2); letter-spacing: 1px; }
+      `}</style>
+      <div className="sp-body">
+        <header className="sp-header">
+          <Link href="/" className="sp-logo">
+            <span style={{ fontSize: "14pt" }}>🦞</span>
+            <span>Claw Con</span>
+          </Link>
+          <Link href="/" className="sp-nav-link">submissions</Link>
+          <span>|</span>
+          <span className="sp-nav-active">sponsors</span>
+        </header>
 
-      {/* Hero */}
-      <div style={{ textAlign: "center", padding: "60px 24px 40px" }}>
-        <div style={{ fontSize: "56px", marginBottom: "8px" }}>🦞</div>
-        <h1
-          style={{
-            fontSize: "clamp(28px, 5vw, 48px)",
-            fontWeight: 900,
-            letterSpacing: "-1.5px",
-            background: "linear-gradient(135deg, #ff6b5a 0%, #ff4530 50%, #ff6b5a 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            lineHeight: 1.15,
-            margin: "0 0 12px",
-          }}
-        >
-          ClawCon: 1st OpenClaw SF Show & Tell
-        </h1>
-        <p
-          style={{
-            fontSize: "18px",
-            fontWeight: 500,
-            color: "rgba(255,255,255,0.4)",
-            letterSpacing: "6px",
-            textTransform: "uppercase",
-            margin: 0,
-          }}
-        >
-          Thank You to Our Sponsors
-        </p>
-      </div>
+        <div className="sp-hero">
+          <div className="sp-emoji">🦞</div>
+          <h1 className="sp-title">ClawCon: 1st OpenClaw SF Show & Tell</h1>
+          <p className="sp-subtitle">Thank You to Our Sponsors</p>
+        </div>
 
-      {/* Sponsors Grid */}
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "0 24px 60px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {sponsors.map((sponsor) => (
-          <a
-            key={sponsor.name}
-            href={sponsor.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              background: "rgba(255,255,255,0.035)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: "14px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "28px 16px 20px",
-              minHeight: "160px",
-              textDecoration: "none",
-              transition: "background 0.2s, border-color 0.2s, transform 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.07)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.035)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
-            <div
-              style={{
-                width: "160px",
-                height: "70px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "12px",
-                position: "relative",
-              }}
+        <div className="sp-grid">
+          {sponsors.map((sponsor) => (
+            <a
+              key={sponsor.name}
+              href={sponsor.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sp-card"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={sponsor.logo}
-                alt={sponsor.name}
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  objectFit: "contain",
-                  filter: sponsor.invert ? "brightness(0) invert(1)" : "none",
-                  opacity: sponsor.invert ? 0.85 : 0.9,
-                }}
-              />
-            </div>
-            <div
-              style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.7)",
-                textAlign: "center",
-              }}
-            >
-              {sponsor.name}
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: "rgba(255,255,255,0.35)",
-                marginTop: "4px",
-                textAlign: "center",
-              }}
-            >
-              {sponsor.contribution}
-            </div>
-          </a>
-        ))}
-      </div>
+              <div className="sp-logo-wrap">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  className={sponsor.invert ? "invert" : "white"}
+                />
+              </div>
+              <div className="sp-name">{sponsor.name}</div>
+              <div className="sp-contrib">{sponsor.contribution}</div>
+            </a>
+          ))}
+        </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "24px",
-          fontSize: "13px",
-          color: "rgba(255,255,255,0.2)",
-          letterSpacing: "1px",
-        }}
-      >
-        February 4, 2026 · Frontier Tower · San Francisco
+        <div className="sp-footer">February 4, 2026 · Frontier Tower · San Francisco</div>
       </div>
-    </div>
+    </>
   );
 }
