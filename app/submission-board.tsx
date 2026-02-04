@@ -338,6 +338,14 @@ export default function SubmissionBoard() {
             <a href="https://lu.ma/moltbot-sf-show-tell" target="_blank" rel="noreferrer" className="hn-nav-link">
               register
             </a>
+            <span className="hn-nav-sep">|</span>
+            <a href="/sponsors" className="hn-nav-link">
+              sponsors
+            </a>
+            <span className="hn-nav-sep">|</span>
+            <a href="/molt" className="hn-nav-link">
+              molt
+            </a>
           </nav>
           {userEmail && (
             <div className="hn-user">

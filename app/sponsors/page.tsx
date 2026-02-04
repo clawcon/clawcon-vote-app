@@ -59,6 +59,8 @@ export default function SponsorsPage() {
           <Link href="/" className="sp-nav-link">submissions</Link>
           <span>|</span>
           <span className="sp-nav-active">sponsors</span>
+          <span>|</span>
+          <Link href="/molt" className="sp-nav-link" style={{ color: "#000", fontFamily: "Verdana, Geneva, sans-serif", fontSize: "10pt", textDecoration: "none" }}>molt</Link>
         </header>
 
         <div className="sp-hero">
