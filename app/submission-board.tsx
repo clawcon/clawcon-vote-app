@@ -346,6 +346,10 @@ export default function SubmissionBoard() {
             <a href="/molt" className="hn-nav-link">
               molt
             </a>
+            <span className="hn-nav-sep">|</span>
+            <a href="/youarehere" className="hn-nav-link">
+              you are here
+            </a>
           </nav>
           {userEmail && (
             <div className="hn-user">
