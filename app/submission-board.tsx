@@ -134,9 +134,15 @@ export default function SubmissionBoard() {
     return () => observer.disconnect();
   }, [loadMore, hasMore]);
 
+  const isBlockedEmail = (addr: string) => addr.toLowerCase().endsWith("@agentmail.to");
+
   const handleMagicLink = async (event: React.FormEvent) => {
     event.preventDefault();
     setNotice(null);
+    if (isBlockedEmail(email)) {
+      setNotice("Disposable email addresses are not allowed. Please use a real email.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -162,6 +168,10 @@ export default function SubmissionBoard() {
       setShowSignInModal(true);
       return;
     }
+    if (session.user?.email && isBlockedEmail(session.user.email)) {
+      setNotice("Your account has been restricted.");
+      return;
+    }
     setNotice(null);
     setVoteLoading(submissionId);
     const { error } = await supabase.from("votes").insert({
@@ -183,6 +193,10 @@ export default function SubmissionBoard() {
     event.preventDefault();
     if (!session) {
       setShowSignInModal(true);
+      return;
+    }
+    if (session.user?.email && isBlockedEmail(session.user.email)) {
+      setNotice("Your account has been restricted.");
       return;
     }
     setNotice(null);
