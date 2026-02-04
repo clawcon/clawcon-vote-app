@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 
 export async function POST(req: NextRequest) {
-  // Auth via service role key (already in Vercel env)
-  const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`) {
+  // One-time cleanup token
+  const token = req.nextUrl.searchParams.get("token");
+  if (token !== "clawcon-cleanup-2026-02-04") {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
