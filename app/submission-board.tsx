@@ -336,7 +336,7 @@ export default function SubmissionBoard() {
             </button>
             <span className="hn-nav-sep">|</span>
             <a href="https://lu.ma/moltbot-sf-show-tell" target="_blank" rel="noreferrer" className="hn-nav-link">
-              register
+              event page
             </a>
             <span className="hn-nav-sep">|</span>
             <a href="/sponsors" className="hn-nav-link">
