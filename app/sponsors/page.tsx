@@ -20,7 +20,7 @@ const sponsors = [
 ];
 
 export const metadata = {
-  title: "Sponsors – ClawdCon SF",
+  title: "Sponsors – Claw Con SF",
   description: "Thank you to the sponsors of the 1st OpenClaw SF Show & Tell.",
 };
 
@@ -54,7 +54,7 @@ export default function SponsorsPage() {
         <header className="sp-header">
           <Link href="/" className="sp-logo">
             <span style={{ fontSize: "14pt" }}>🦞</span>
-            <span>ClawdCon</span>
+            <span>Claw Con</span>
           </Link>
           <Link href="/" className="sp-nav-link">submissions</Link>
           <span>|</span>

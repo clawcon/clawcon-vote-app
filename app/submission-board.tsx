@@ -138,7 +138,7 @@ export default function SubmissionBoard() {
 
   const handleMagicLink = async (event: React.FormEvent) => {
     event.preventDefault();
-    setNotice("Sign-up is currently disabled. Thanks for attending ClawdCon! 🦞");
+    setNotice("Sign-up is currently disabled. Thanks for attending Claw Con! 🦞");
     return;
   };
 
@@ -147,13 +147,13 @@ export default function SubmissionBoard() {
   };
 
   const handleVote = async (_submissionId: string) => {
-    setNotice("Voting is currently disabled. Thanks for attending ClawdCon! 🦞");
+    setNotice("Voting is currently disabled. Thanks for attending Claw Con! 🦞");
     return;
   };
 
   const handleSubmission = async (event: React.FormEvent) => {
     event.preventDefault();
-    setNotice("Submissions are currently disabled. Thanks for attending ClawdCon! 🦞");
+    setNotice("Submissions are currently disabled. Thanks for attending Claw Con! 🦞");
     return;
   };
 
@@ -237,7 +237,7 @@ export default function SubmissionBoard() {
         <div className="hn-header-left">
           <div className="hn-logo">
             <span className="hn-logo-icon">🦞</span>
-            <span className="hn-logo-text">ClawdCon</span>
+            <span className="hn-logo-text">Claw Con</span>
           </div>
           <nav className="hn-nav">
             <button
@@ -331,7 +331,7 @@ export default function SubmissionBoard() {
                             <span className="hn-domain">({domain})</span>
                           )}
                           {submission.is_openclaw_contributor && (
-                            <span className="hn-badge contributor" title="OpenClawdContributor">🦞</span>
+                            <span className="hn-badge contributor" title="OpenClaw Contributor">🦞</span>
                           )}
                           {submission.links?.some((l) => l.includes("github.com")) && (
                             <span className="hn-badge oss" title="Open Source">⭐</span>
@@ -539,9 +539,9 @@ x-api-key: <BOT_KEY>
                 className="hn-button small"
                 style={{marginTop: "12px", width: "100%"}}
                 onClick={() => {
-                  const agentPrompt = `# ClawdCon Submission API
+                  const agentPrompt = `# Claw Con Submission API
 
-Submit a demo or topic to ClawdCon (clawdcon.com) via API.
+Submit a demo or topic to Claw Con (clawdcon.com) via API.
 
 ## Endpoint
 POST https://clawdcon.com/api/webhook

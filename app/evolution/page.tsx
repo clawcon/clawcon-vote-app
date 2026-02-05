@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Evolution | ClawdCon",
+  title: "Evolution | Claw Con",
   description: "The evolution of work",
 };
 
