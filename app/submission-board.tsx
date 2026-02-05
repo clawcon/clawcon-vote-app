@@ -270,6 +270,10 @@ export default function SubmissionBoard() {
               you are here
             </a>
             <span className="hn-nav-sep">|</span>
+            <a href="/evolution" className="hn-nav-link">
+              evolution
+            </a>
+            <span className="hn-nav-sep">|</span>
             <a href="https://t.me/clawcon" target="_blank" rel="noreferrer" className="hn-nav-link">
               join telegram
             </a>
