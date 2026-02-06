@@ -347,6 +347,10 @@ export default function SubmissionBoard() {
               sponsors
             </a>
             <span className="hn-nav-sep">|</span>
+            <a href="/photos" className="hn-nav-link">
+              photos
+            </a>
+            <span className="hn-nav-sep">|</span>
             <a href="/molt" className="hn-nav-link">
               molt
             </a>

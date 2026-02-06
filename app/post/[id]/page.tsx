@@ -242,6 +242,8 @@ export default function PostPage() {
             <a href="https://lu.ma/moltbot-sf-show-tell" target="_blank" rel="noreferrer" className="hn-nav-link">
               register
             </a>
+            <span className="hn-nav-sep">|</span>
+            <Link href="/photos" className="hn-nav-link">photos</Link>
           </nav>
           {userEmail && (
             <div className="hn-user">
