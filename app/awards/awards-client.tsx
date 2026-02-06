@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
-import CitySidebar from "../city-sidebar";
+import CitySelect from "../city-select";
 
 type AwardKind = "prize" | "grant" | "challenge" | "bounty";
 
@@ -191,6 +191,8 @@ export default function AwardsClient() {
           </nav>
 
           <div className="hn-header-right">
+            <CitySelect path="/awards" activeCityKey={city.key} />
+
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >
@@ -229,7 +231,7 @@ export default function AwardsClient() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <CitySidebar path="/awards" activeCityKey={city.key} />
+      {/* city selector moved to header */}
 
       <div className="hn-layout">
         <main className="hn-main">

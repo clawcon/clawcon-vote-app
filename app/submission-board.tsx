@@ -7,7 +7,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 import type { Submission } from "../lib/types";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../lib/cities";
-import CitySidebar from "./city-sidebar";
+import CitySelect from "./city-select";
 import { sanitizeLink, getDomain, timeAgo } from "../lib/utils";
 
 export default function SubmissionBoard() {
@@ -499,6 +499,8 @@ export default function SubmissionBoard() {
             </a>
           </nav>
           <div className="hn-header-right">
+            <CitySelect path="/" activeCityKey={city.key} />
+
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >
@@ -537,7 +539,7 @@ export default function SubmissionBoard() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <CitySidebar path="/" activeCityKey={city.key} />
+      {/* city selector moved to header */}
 
       <div className="hn-layout">
         {/* Main content - submissions list */}

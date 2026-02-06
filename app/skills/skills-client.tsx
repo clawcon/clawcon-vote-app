@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
-import CitySidebar from "../city-sidebar";
+import CitySelect from "../city-select";
 
 type ViewMode = "grid" | "list";
 
@@ -175,6 +175,8 @@ export default function SkillsClient() {
           </nav>
 
           <div className="hn-header-right">
+            <CitySelect path="/skills" activeCityKey={city.key} />
+
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >
@@ -213,7 +215,7 @@ export default function SkillsClient() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <CitySidebar path="/skills" activeCityKey={city.key} />
+      {/* city selector moved to header */}
 
       <div className="hn-layout">
         <main className="hn-main">

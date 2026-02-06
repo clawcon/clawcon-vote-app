@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { CITIES, DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
-import CitySidebar from "../city-sidebar";
+import CitySelect from "../city-select";
 
 type EventRow = {
   id: string;
@@ -336,6 +336,8 @@ export default function EventsClient() {
           </nav>
 
           <div className="hn-header-right">
+            <CitySelect path="/events" activeCityKey={city.key} />
+
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >
@@ -374,7 +376,7 @@ export default function EventsClient() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <CitySidebar path="/events" activeCityKey={city.key} />
+      {/* city selector moved to header */}
 
       <div className="hn-layout">
         <main className="hn-main">
