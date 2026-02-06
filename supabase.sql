@@ -1,7 +1,19 @@
 create extension if not exists "pgcrypto";
 
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  slug text not null unique,
+  name text null,
+  city text null,
+  starts_at timestamptz null,
+  ends_at timestamptz null,
+  is_public boolean not null default true
+);
+
 create table if not exists public.submissions (
   id uuid primary key default gen_random_uuid(),
+  event_id uuid null references public.events(id) on delete set null,
   title text not null,
   description text not null,
   presenter_name text not null,
@@ -58,10 +70,14 @@ create trigger set_bot_keys_updated_at
   for each row
   execute function public.set_updated_at();
 
+alter table public.events enable row level security;
 alter table public.submissions enable row level security;
 alter table public.votes enable row level security;
 alter table public.bot_keys enable row level security;
 alter table public.bot_key_audit enable row level security;
+
+create policy "Public can read events" on public.events
+  for select using (true);
 
 create policy "Public can read submissions" on public.submissions
   for select using (true);
@@ -104,6 +120,7 @@ create policy "Authenticated can read own votes" on public.votes
   for select to authenticated
   using (auth.uid() = user_id);
 
+-- Legacy (no-arg) RPC: kept for backward compatibility
 create or replace function public.get_submissions_with_votes()
 returns table (
   id uuid,
@@ -143,6 +160,49 @@ as $$
 $$;
 
 grant execute on function public.get_submissions_with_votes() to anon, authenticated;
+
+-- Event-scoped RPC (new)
+create or replace function public.get_submissions_with_votes(_event_slug text)
+returns table (
+  id uuid,
+  title text,
+  description text,
+  presenter_name text,
+  links text[],
+  submission_type text,
+  submitted_by text,
+  submitted_for_name text,
+  created_at timestamptz,
+  vote_count integer
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    s.id,
+    s.title,
+    s.description,
+    s.presenter_name,
+    s.links,
+    s.submission_type,
+    s.submitted_by,
+    s.submitted_for_name,
+    s.created_at,
+    coalesce(v.vote_count, 0) as vote_count
+  from public.submissions s
+  join public.events e on e.id = s.event_id
+  left join (
+    select submission_id, count(*)::int as vote_count
+    from public.votes
+    group by submission_id
+  ) v on v.submission_id = s.id
+  where e.slug = _event_slug
+  order by coalesce(v.vote_count, 0) desc, s.created_at desc;
+$$;
+
+grant execute on function public.get_submissions_with_votes(text) to anon, authenticated;
 
 -- chats
 create table if not exists public.chats (
