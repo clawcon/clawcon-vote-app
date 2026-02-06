@@ -463,6 +463,7 @@ export default function SubmissionBoard() {
             >
               topics
             </button>
+            <span className="hn-nav-sep">|</span>
             <a href={withCity("/events", city.key)} className="hn-nav-link">
               events
             </a>
