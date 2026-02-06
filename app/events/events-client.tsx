@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
-import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
+import { CITIES, DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
 import CitySidebar from "../city-sidebar";
 
 type EventRow = {
@@ -103,6 +103,12 @@ export default function EventsClient() {
 
   const [view, setView] = useState<ViewMode>("grid");
 
+  // Filters
+  const [filterCityKey, setFilterCityKey] = useState<string>(city.key);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterFrom, setFilterFrom] = useState<string>("");
+  const [filterTo, setFilterTo] = useState<string>("");
+
   // Form state
   const [name, setName] = useState("");
   const [category, setCategory] = useState<CategoryKey>("demo-day");
@@ -172,12 +178,52 @@ export default function EventsClient() {
 
   useEffect(() => {
     setCityName(city.label);
-  }, [city.label]);
+    setFilterCityKey(city.key);
+  }, [city.key, city.label]);
+
+  function eventStartDate(e: EventRow): Date | null {
+    if (e.starts_at) {
+      const d = new Date(e.starts_at);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    if (e.month && typeof e.year === "number") {
+      const idx = MONTHS.indexOf(e.month as any);
+      const monthIdx = idx >= 0 ? idx : 0;
+      const d = new Date(Date.UTC(e.year, monthIdx, 1));
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    if (typeof e.year === "number") {
+      const d = new Date(Date.UTC(e.year, 0, 1));
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    return null;
+  }
 
   const filtered = useMemo(() => {
-    const cityLabel = city.label.toLowerCase();
-    return events.filter((e) => e.city.toLowerCase().includes(cityLabel));
-  }, [events, city.label]);
+    const from = filterFrom ? new Date(`${filterFrom}T00:00:00`) : null;
+    const to = filterTo ? new Date(`${filterTo}T23:59:59`) : null;
+
+    const cityLabel =
+      filterCityKey === "all" ? null : getCity(filterCityKey).label;
+
+    return events.filter((e) => {
+      if (cityLabel && e.city !== cityLabel) return false;
+      if (filterCategory !== "all" && e.category !== filterCategory)
+        return false;
+
+      if (from || to) {
+        const d = eventStartDate(e);
+        if (!d) return false;
+        if (from && d < from) return false;
+        if (to && d > to) return false;
+      }
+
+      return true;
+    });
+  }, [events, filterCityKey, filterCategory, filterFrom, filterTo]);
 
   const canCreate = Boolean(session);
 
@@ -333,13 +379,97 @@ export default function EventsClient() {
       <div className="hn-layout">
         <main className="hn-main">
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <h2 style={{ margin: 0 }}>Events · {city.label}</h2>
+            <h2 style={{ margin: 0 }}>
+              Events
+              {filterCityKey === "all"
+                ? ""
+                : ` · ${getCity(filterCityKey).label}`}
+            </h2>
             <span style={{ color: "#6b7280", fontSize: 12 }}>
               Browse upcoming & past Claw Con events.
             </span>
           </div>
 
-          <div style={{ margin: "10px 0 12px", display: "flex", gap: 8 }}>
+          <div
+            style={{
+              margin: "10px 0 12px",
+              display: "flex",
+              gap: 8,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <select
+              className="input"
+              value={filterCityKey}
+              onChange={(e) => setFilterCityKey(e.target.value)}
+              aria-label="Filter by city"
+              style={{ maxWidth: 220 }}
+            >
+              <option value="all">All cities</option>
+              {CITIES.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="input"
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              aria-label="Filter by event type"
+              style={{ maxWidth: 220 }}
+            >
+              <option value="all">All types</option>
+              <option value="demo-day">demo-day</option>
+              <option value="bootcamp">bootcamp</option>
+              <option value="focus-group">focus-group</option>
+              <option value="happy-hour">happy-hour</option>
+              <option value="coffee">coffee</option>
+              <option value="cowork">cowork</option>
+              <option value="meetup">meetup</option>
+              <option value="workshop">workshop</option>
+              <option value="conference">conference</option>
+            </select>
+
+            <input
+              className="input"
+              type="date"
+              value={filterFrom}
+              onChange={(e) => setFilterFrom(e.target.value)}
+              aria-label="From date"
+              style={{ maxWidth: 180 }}
+            />
+            <input
+              className="input"
+              type="date"
+              value={filterTo}
+              onChange={(e) => setFilterTo(e.target.value)}
+              aria-label="To date"
+              style={{ maxWidth: 180 }}
+            />
+
+            <button
+              className="hn-button"
+              onClick={() => {
+                setFilterCityKey(city.key);
+                setFilterCategory("all");
+                setFilterFrom("");
+                setFilterTo("");
+              }}
+              disabled={
+                filterCityKey === city.key &&
+                filterCategory === "all" &&
+                !filterFrom &&
+                !filterTo
+              }
+            >
+              Reset
+            </button>
+
+            <div style={{ flexBasis: "100%", height: 0 }} />
+
             <button
               className="hn-button"
               onClick={() => setView("list")}
@@ -359,7 +489,7 @@ export default function EventsClient() {
           {loading ? (
             <p style={{ color: "#6b7280" }}>Loading…</p>
           ) : filtered.length === 0 ? (
-            <p style={{ color: "#6b7280" }}>No events yet for {city.label}.</p>
+            <p style={{ color: "#6b7280" }}>No matching events.</p>
           ) : view === "list" ? (
             <table className="hn-table">
               <tbody>
