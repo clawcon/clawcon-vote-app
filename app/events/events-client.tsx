@@ -196,271 +196,294 @@ export default function EventsClient() {
   };
 
   return (
-    <main style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
-      <header style={{ marginBottom: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div>
-            <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 6 }}>
-              Events
-            </h1>
-            <p style={{ color: "#4b5563", margin: 0 }}>
-              {city.label} · Browse upcoming & past Claw Con events.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-            <Link href={withCity("/", city.key)} className="hn-button">
-              ← submissions
-            </Link>
-          </div>
-        </div>
-
-        <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-          <button
-            className="hn-button"
-            onClick={() => setView("grid")}
-            disabled={view === "grid"}
-          >
-            Grid
-          </button>
-          <button
-            className="hn-button"
-            onClick={() => setView("list")}
-            disabled={view === "list"}
-          >
-            List
-          </button>
-        </div>
-
-        {notice && <div className="hn-notice">{notice}</div>}
-      </header>
-
-      <section style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
-          Submit an event
-        </h2>
-
-        {!canCreate ? (
-          <p style={{ color: "#6b7280" }}>
-            Sign in on the submissions page to submit events.
-          </p>
-        ) : null}
-
-        <form onSubmit={handleSubmit} className="hn-form">
-          <label>
-            Name
-            <input
-              className="input"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Claw Con SF Show & Tell"
-              required
-              disabled={!canCreate}
-            />
-          </label>
-
-          <label>
-            Category
-            <select
-              className="input"
-              value={category}
-              onChange={(e) => setCategory(e.target.value as CategoryKey)}
-              disabled={!canCreate}
+    <>
+      <div className="hn-header">
+        <div className="hn-header-left">
+          <Link href={withCity("/", city.key)} className="hn-logo">
+            <span className="hn-logo-icon">🦞</span>
+            <span className="hn-logo-text">Claw Con</span>
+          </Link>
+          <nav className="hn-nav">
+            <a
+              href={withCity("/events", city.key)}
+              className="hn-nav-link active"
             >
-              <option value="show-tell">show-tell</option>
-              <option value="meetup">meetup</option>
-              <option value="workshop">workshop</option>
-              <option value="conference">conference</option>
-            </select>
-          </label>
+              events
+            </a>
+            <span className="hn-nav-sep">|</span>
+            <a href={withCity("/", city.key)} className="hn-nav-link">
+              submissions
+            </a>
+          </nav>
+        </div>
+      </div>
 
-          <label>
-            City
-            <input
-              className="input"
-              type="text"
-              value={cityName}
-              onChange={(e) => setCityName(e.target.value)}
-              placeholder="San Francisco"
-              disabled={!canCreate}
-            />
-          </label>
+      {notice && <div className="hn-notice">{notice}</div>}
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
-            <label>
-              Month
-              <select
-                className="input"
-                value={month}
-                onChange={(e) => setMonth(e.target.value)}
-                disabled={!canCreate}
-              >
-                {MONTHS.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
+      <div className="hn-layout">
+        <main className="hn-main">
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+            <h2 style={{ margin: 0 }}>Events · {city.label}</h2>
+            <span style={{ color: "#6b7280", fontSize: 12 }}>
+              Browse upcoming & past Claw Con events.
+            </span>
+          </div>
+
+          <div style={{ margin: "10px 0 12px", display: "flex", gap: 8 }}>
+            <button
+              className="hn-button"
+              onClick={() => setView("list")}
+              disabled={view === "list"}
+            >
+              List
+            </button>
+            <button
+              className="hn-button"
+              onClick={() => setView("grid")}
+              disabled={view === "grid"}
+            >
+              Grid
+            </button>
+          </div>
+
+          {loading ? (
+            <p style={{ color: "#6b7280" }}>Loading…</p>
+          ) : filtered.length === 0 ? (
+            <p style={{ color: "#6b7280" }}>No events yet for {city.label}.</p>
+          ) : view === "list" ? (
+            <table className="hn-table">
+              <tbody>
+                {filtered.map((e, idx) => (
+                  <tr key={e.id} className="hn-row">
+                    <td className="hn-rank">{idx + 1}.</td>
+                    <td className="hn-content">
+                      <div className="hn-title-row">
+                        <span className="hn-title">{e.name}</span>
+                        <span className="hn-domain">({e.city})</span>
+                      </div>
+                      <div className="hn-meta">
+                        <span>
+                          {e.category} · {e.month ? `${e.month} ` : ""}
+                          {e.year}
+                        </span>
+                        {e.starts_at ? (
+                          <>
+                            {" "}
+                            <span>
+                              · {new Date(e.starts_at).toLocaleString()}
+                            </span>
+                          </>
+                        ) : null}{" "}
+                        · <code>{e.slug}</code>
+                      </div>
+                    </td>
+                  </tr>
                 ))}
-              </select>
-            </label>
-            <label>
-              Year
-              <input
-                className="input"
-                type="number"
-                value={year}
-                onChange={(e) => setYear(Number(e.target.value))}
-                min={2020}
-                max={2100}
-                disabled={!canCreate}
-              />
-            </label>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
-            <label>
-              Starts (optional)
-              <input
-                className="input"
-                type="datetime-local"
-                value={startsAt}
-                onChange={(e) => setStartsAt(e.target.value)}
-                disabled={!canCreate}
-              />
-            </label>
-            <label>
-              Ends (optional)
-              <input
-                className="input"
-                type="datetime-local"
-                value={endsAt}
-                onChange={(e) => setEndsAt(e.target.value)}
-                disabled={!canCreate}
-              />
-            </label>
-          </div>
-
-          <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <input
-              type="checkbox"
-              checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              disabled={!canCreate}
-            />
-            <span>Public</span>
-          </label>
-
-          <div style={{ color: "#6b7280", fontSize: 12 }}>
-            Slug preview: <code>{slugPreview}</code>
-          </div>
-
-          <button
-            className="hn-button"
-            type="submit"
-            disabled={!canCreate || submitting}
-          >
-            {submitting ? "Submitting..." : "Submit event"}
-          </button>
-        </form>
-      </section>
-
-      <section>
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
-          {city.label} events
-        </h2>
-
-        {loading ? (
-          <p style={{ color: "#6b7280" }}>Loading…</p>
-        ) : filtered.length === 0 ? (
-          <p style={{ color: "#6b7280" }}>No events yet for {city.label}.</p>
-        ) : view === "list" ? (
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10 }}>
-            {filtered.map((e, idx) => (
-              <div
-                key={e.id}
-                style={{
-                  padding: 12,
-                  borderBottom:
-                    idx === filtered.length - 1 ? "none" : "1px solid #e5e7eb",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 12,
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700 }}>{e.name}</div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>
-                    {e.city} · {e.category} · {e.month ? `${e.month} ` : ""}
-                    {e.year}
+              </tbody>
+            </table>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: 12,
+                marginTop: 12,
+              }}
+            >
+              {filtered.map((e) => (
+                <div
+                  key={e.id}
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 12,
+                    padding: 14,
+                    background: "#fff",
+                  }}
+                >
+                  <div style={{ fontWeight: 800, marginBottom: 6 }}>
+                    {e.name}
                   </div>
                   <div style={{ color: "#6b7280", fontSize: 12 }}>
+                    {e.city} · {e.category}
+                  </div>
+                  <div style={{ color: "#111827", fontSize: 13, marginTop: 8 }}>
+                    {e.month ? `${e.month} ` : ""}
+                    {e.year}
+                  </div>
+                  {e.starts_at ? (
+                    <div
+                      style={{ color: "#6b7280", fontSize: 12, marginTop: 6 }}
+                    >
+                      {new Date(e.starts_at).toLocaleString()}
+                    </div>
+                  ) : null}
+                  <div
+                    style={{ color: "#6b7280", fontSize: 11, marginTop: 10 }}
+                  >
                     <code>{e.slug}</code>
                   </div>
                 </div>
-                <div style={{ color: "#6b7280", fontSize: 12 }}>
-                  {e.starts_at ? new Date(e.starts_at).toLocaleString() : ""}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-              gap: 12,
-            }}
-          >
-            {filtered.map((e) => (
-              <div
-                key={e.id}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 14,
-                  background: "#fff",
-                }}
-              >
-                <div style={{ fontWeight: 800, marginBottom: 6 }}>{e.name}</div>
-                <div
-                  style={{ color: "#6b7280", fontSize: 12, marginBottom: 8 }}
-                >
-                  {e.city} · {e.category}
-                </div>
-                <div style={{ color: "#111827", fontSize: 13 }}>
-                  {e.month ? `${e.month} ` : ""}
-                  {e.year}
-                </div>
-                {e.starts_at ? (
-                  <div style={{ color: "#6b7280", fontSize: 12, marginTop: 6 }}>
-                    {new Date(e.starts_at).toLocaleString()}
-                  </div>
-                ) : null}
-                <div style={{ color: "#6b7280", fontSize: 11, marginTop: 10 }}>
-                  <code>{e.slug}</code>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        <div style={{ marginTop: 14, color: "#6b7280", fontSize: 12 }}>
-          Tip: switch cities on the submissions page; this page follows{" "}
-          <code>?city=</code>.
-        </div>
-      </section>
-    </main>
+          <div style={{ marginTop: 14, color: "#6b7280", fontSize: 12 }}>
+            Tip: switch cities on the submissions page; this page follows{" "}
+            <code>?city=</code>.
+          </div>
+        </main>
+
+        <aside className="hn-sidebar">
+          <div className="hn-sidebar-box">
+            <h3>Submit an Event</h3>
+            {!canCreate ? (
+              <div className="hn-signin-prompt">
+                <p>Sign in on the submissions page to submit events.</p>
+                <Link href={withCity("/", city.key)} className="hn-button">
+                  Sign in
+                </Link>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="hn-form">
+                <label>
+                  Name
+                  <input
+                    className="input"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Claw Con SF Show & Tell"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Category
+                  <select
+                    className="input"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as CategoryKey)}
+                  >
+                    <option value="show-tell">show-tell</option>
+                    <option value="meetup">meetup</option>
+                    <option value="workshop">workshop</option>
+                    <option value="conference">conference</option>
+                  </select>
+                </label>
+
+                <label>
+                  City
+                  <input
+                    className="input"
+                    type="text"
+                    value={cityName}
+                    onChange={(e) => setCityName(e.target.value)}
+                    placeholder={city.label}
+                  />
+                </label>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 12,
+                  }}
+                >
+                  <label>
+                    Month
+                    <select
+                      className="input"
+                      value={month}
+                      onChange={(e) => setMonth(e.target.value)}
+                    >
+                      {MONTHS.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Year
+                    <input
+                      className="input"
+                      type="number"
+                      value={year}
+                      onChange={(e) => setYear(Number(e.target.value))}
+                      min={2020}
+                      max={2100}
+                    />
+                  </label>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 12,
+                  }}
+                >
+                  <label>
+                    Starts (optional)
+                    <input
+                      className="input"
+                      type="datetime-local"
+                      value={startsAt}
+                      onChange={(e) => setStartsAt(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Ends (optional)
+                    <input
+                      className="input"
+                      type="datetime-local"
+                      value={endsAt}
+                      onChange={(e) => setEndsAt(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                <label
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                  />
+                  <span>Public</span>
+                </label>
+
+                <div style={{ color: "#6b7280", fontSize: 12 }}>
+                  Slug preview: <code>{slugPreview}</code>
+                </div>
+
+                <button
+                  className="hn-button"
+                  type="submit"
+                  disabled={submitting}
+                >
+                  {submitting ? "Submitting..." : "Submit"}
+                </button>
+              </form>
+            )}
+          </div>
+
+          <div className="hn-sidebar-box">
+            <h4>📅 Event ideas</h4>
+            <ul className="hn-ideas">
+              <li>Monthly show & tell</li>
+              <li>Lightning talks night</li>
+              <li>Co-working / build day</li>
+              <li>Agent safety workshop</li>
+              <li>Hack night (small prizes)</li>
+            </ul>
+            <p className="hn-tip">
+              Keep it small, repeatable, and easy to host.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </>
   );
 }
