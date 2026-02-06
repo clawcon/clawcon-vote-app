@@ -23,7 +23,21 @@ create table if not exists public.submissions (
   submitted_for_name text null,
   submitted_for_contact text null,
   created_at timestamptz not null default now(),
-  constraint submission_type_check check (submission_type in ('speaker_demo', 'topic', 'robot')),
+  constraint submission_type_check check (
+    submission_type in (
+      'speaker_demo',
+      'topic',
+      'robot',
+      'paper',
+      'sponsor',
+      'award',
+      'job',
+      'livestream',
+      'skill',
+      'meme',
+      'chat'
+    )
+  ),
   constraint submitted_by_check check (submitted_by in ('human', 'bot', 'bot_on_behalf'))
 );
 
