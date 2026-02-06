@@ -157,7 +157,7 @@ export default function SkillsClient() {
             </a>
             <span className="hn-nav-sep">|</span>
             <a href={withCity("/chats", city.key)} className="hn-nav-link">
-              chats
+              join the chat
             </a>
             <span className="hn-nav-sep">|</span>
             <a href={withCity("/memes", city.key)} className="hn-nav-link">

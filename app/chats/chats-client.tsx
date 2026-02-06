@@ -204,7 +204,7 @@ export default function ChatsClient() {
               href={withCity("/chats", city.key)}
               className="hn-nav-link active"
             >
-              chats
+              join the chat
             </a>
             <span className="hn-nav-sep">|</span>
             <a href="/skills" className="hn-nav-link">

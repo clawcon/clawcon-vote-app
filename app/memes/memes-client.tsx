@@ -202,7 +202,7 @@ export default function MemesClient() {
             </a>
             <span className="hn-nav-sep">|</span>
             <a href={withCity("/chats", city.key)} className="hn-nav-link">
-              chats
+              join the chat
             </a>
             <span className="hn-nav-sep">|</span>
             <a href="/skills" className="hn-nav-link">
