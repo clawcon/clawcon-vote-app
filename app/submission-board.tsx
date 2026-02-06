@@ -437,6 +437,8 @@ export default function SubmissionBoard() {
             <span className="hn-logo-icon">🦞</span>
             <span className="hn-logo-text">Claw Con</span>
           </div>
+
+          <CitySelect path="/" activeCityKey={city.key} />
           <nav className="hn-nav">
             <button
               className={`hn-nav-link ${activeTab === "speaker_demo" ? "active" : ""}`}
@@ -503,8 +505,6 @@ export default function SubmissionBoard() {
             </a>
           </nav>
           <div className="hn-header-right">
-            <CitySelect path="/" activeCityKey={city.key} />
-
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >

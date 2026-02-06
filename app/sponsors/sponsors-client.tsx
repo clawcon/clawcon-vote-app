@@ -269,6 +269,8 @@ export default function SponsorsClient() {
             <span className="hn-logo-icon">🦞</span>
             <span className="hn-logo-text">Claw Con</span>
           </Link>
+
+          <CitySelect path="/sponsors" activeCityKey={city.key} />
           <nav className="hn-nav">
             <a href={withCity("/", city.key)} className="hn-nav-link">
               demos
@@ -327,8 +329,6 @@ export default function SponsorsClient() {
           </nav>
 
           <div className="hn-header-right">
-            <CitySelect path="/sponsors" activeCityKey={city.key} />
-
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >

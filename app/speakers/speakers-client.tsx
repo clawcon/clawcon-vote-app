@@ -190,6 +190,8 @@ export default function SpeakersClient() {
             <span className="hn-logo-icon">🦞</span>
             <span className="hn-logo-text">Claw Con</span>
           </Link>
+
+          <CitySelect path="/speakers" activeCityKey={city.key} />
           <nav className="hn-nav">
             <a href={withCity("/", city.key)} className="hn-nav-link">
               demos
@@ -248,8 +250,6 @@ export default function SpeakersClient() {
           </nav>
 
           <div className="hn-header-right">
-            <CitySelect path="/speakers" activeCityKey={city.key} />
-
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >

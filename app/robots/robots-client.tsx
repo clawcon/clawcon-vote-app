@@ -101,6 +101,8 @@ export default function RobotsClient() {
             <span className="hn-logo-icon">🦞</span>
             <span className="hn-logo-text">Claw Con</span>
           </Link>
+
+          <CitySelect path="/robots" activeCityKey={city.key} />
           <nav className="hn-nav">
             <a href={withCity("/", city.key)} className="hn-nav-link">
               demos
@@ -159,8 +161,6 @@ export default function RobotsClient() {
           </nav>
 
           <div className="hn-header-right">
-            <CitySelect path="/robots" activeCityKey={city.key} />
-
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >

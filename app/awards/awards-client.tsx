@@ -137,6 +137,8 @@ export default function AwardsClient() {
             <span className="hn-logo-icon">🦞</span>
             <span className="hn-logo-text">Claw Con</span>
           </Link>
+
+          <CitySelect path="/awards" activeCityKey={city.key} />
           <nav className="hn-nav">
             <a href={withCity("/", city.key)} className="hn-nav-link">
               demos
@@ -195,8 +197,6 @@ export default function AwardsClient() {
           </nav>
 
           <div className="hn-header-right">
-            <CitySelect path="/awards" activeCityKey={city.key} />
-
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
             >
