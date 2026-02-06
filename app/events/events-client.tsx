@@ -77,6 +77,23 @@ export default function EventsClient() {
 
   const [session, setSession] = useState<Session | null>(null);
   const userEmail = session?.user?.email ?? null;
+
+  const [lang, setLang] = useState<string>(() => {
+    try {
+      return window.localStorage.getItem("clawcon.lang") || "en";
+    } catch {
+      return "en";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("clawcon.lang", lang);
+    } catch {}
+    try {
+      document.documentElement.lang = lang;
+    } catch {}
+  }, [lang]);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -276,6 +293,24 @@ export default function EventsClient() {
           </nav>
 
           <div className="hn-header-right">
+            <label
+              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+            >
+              <span style={{ color: "#000" }}>lang</span>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value)}
+                style={{ padding: "2px 6px" }}
+                aria-label="Select language"
+              >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="ja">日本語</option>
+              </select>
+            </label>
+
             {userEmail && (
               <div className="hn-user">
                 <button
