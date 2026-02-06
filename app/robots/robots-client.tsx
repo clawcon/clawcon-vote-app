@@ -4,33 +4,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
+import CitySelect from "../city-select";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
-import CitySelect from "../city-select";
 
-type JobRow = {
+type RobotRow = {
   id: string;
   created_at: string;
   city: string;
-  company: string;
-  title: string;
-  location: string | null;
-  url: string;
-  compensation: string | null;
-  notes: string | null;
+  robot_name: string;
+  maker_name: string;
+  emergence_date: string; // date
 };
 
-function safeUrl(input: string): string | null {
-  try {
-    const u = new URL(input);
-    if (u.protocol !== "https:") return null;
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
-
-export default function JobsClient() {
+export default function RobotsClient() {
   const searchParams = useSearchParams();
   const cityKey = searchParams.get("city") || DEFAULT_CITY_KEY;
   const city = getCity(cityKey);
@@ -55,32 +42,15 @@ export default function JobsClient() {
     } catch {}
   }, [lang]);
 
-  const [rows, setRows] = useState<JobRow[]>([]);
+  const [rows, setRows] = useState<RobotRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const [view, setView] = useState<"list" | "grid">("list");
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem("clawcon.jobs.view");
-      if (stored === "list" || stored === "grid") setView(stored);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem("clawcon.jobs.view", view);
-    } catch {}
-  }, [view]);
-
-  const [formCompany, setFormCompany] = useState("");
-  const [formTitle, setFormTitle] = useState("");
-  const [formLocation, setFormLocation] = useState("");
-  const [formUrl, setFormUrl] = useState("");
-  const [formComp, setFormComp] = useState("");
-  const [formNotes, setFormNotes] = useState("");
+  // form
+  const [robotName, setRobotName] = useState("");
+  const [makerName, setMakerName] = useState("");
+  const [emergenceDate, setEmergenceDate] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -94,36 +64,33 @@ export default function JobsClient() {
     await supabase.auth.signOut();
   };
 
-  const fetchJobs = useCallback(async () => {
+  const fetchRobots = useCallback(async () => {
     setLoading(true);
     setNotice(null);
 
     const { data, error } = await supabase
-      .from("jobs")
-      .select(
-        "id,created_at,city,company,title,location,url,compensation,notes",
-      )
+      .from("robots")
+      .select("id,created_at,city,robot_name,maker_name,emergence_date")
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(300);
 
     if (error) {
       setRows([]);
-      setNotice("Jobs database not configured yet (missing `jobs` table). ");
+      setNotice("Robots database not configured yet (missing `robots` table).");
       setLoading(false);
       return;
     }
 
-    setRows((data as JobRow[]) || []);
+    setRows((data as RobotRow[]) || []);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
+    fetchRobots();
+  }, [fetchRobots]);
 
   const filtered = useMemo(() => {
-    const cityLabel = city.label;
-    return rows.filter((r) => r.city === cityLabel);
+    return rows.filter((r) => r.city === city.label);
   }, [rows, city.label]);
 
   return (
@@ -151,7 +118,10 @@ export default function JobsClient() {
               speakers
             </a>
             <span className="hn-nav-sep">|</span>
-            <a href={withCity("/robots", city.key)} className="hn-nav-link">
+            <a
+              href={withCity("/robots", city.key)}
+              className="hn-nav-link active"
+            >
               robots
             </a>
             <span className="hn-nav-sep">|</span>
@@ -163,10 +133,7 @@ export default function JobsClient() {
               awards
             </a>
             <span className="hn-nav-sep">|</span>
-            <a
-              href={withCity("/jobs", city.key)}
-              className="hn-nav-link active"
-            >
+            <a href={withCity("/jobs", city.key)} className="hn-nav-link">
               jobs
             </a>
             <span className="hn-nav-sep">|</span>
@@ -192,7 +159,7 @@ export default function JobsClient() {
           </nav>
 
           <div className="hn-header-right">
-            <CitySelect path="/jobs" activeCityKey={city.key} />
+            <CitySelect path="/robots" activeCityKey={city.key} />
 
             <label
               style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
@@ -232,126 +199,54 @@ export default function JobsClient() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      {/* city selector moved to header */}
-
       <div className="hn-layout">
         <main className="hn-main">
           <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <h2 style={{ margin: 0 }}>Jobs · {city.label}</h2>
+            <h2 style={{ margin: 0 }}>Robots · {city.label}</h2>
             <span style={{ color: "#6b7280", fontSize: 12 }}>
-              Post jobs for the community.
+              Bring your weird little friend.
             </span>
-          </div>
-
-          <div style={{ margin: "10px 0 12px", display: "flex", gap: 8 }}>
-            <button
-              className="hn-button"
-              onClick={() => setView("list")}
-              disabled={view === "list"}
-            >
-              List
-            </button>
-            <button
-              className="hn-button"
-              onClick={() => setView("grid")}
-              disabled={view === "grid"}
-            >
-              Grid
-            </button>
           </div>
 
           {loading ? (
             <p style={{ color: "#6b7280", marginTop: 12 }}>Loading…</p>
           ) : filtered.length === 0 ? (
             <p style={{ color: "#6b7280", marginTop: 12 }}>
-              No jobs yet for {city.label}.
+              No robots yet for {city.label}.
             </p>
-          ) : view === "list" ? (
+          ) : (
             <table className="hn-table" style={{ marginTop: 12 }}>
               <tbody>
-                {filtered.map((j, idx) => (
-                  <tr key={j.id} className="hn-row">
+                {filtered.map((r, idx) => (
+                  <tr key={r.id} className="hn-row">
                     <td className="hn-rank">{idx + 1}.</td>
                     <td className="hn-content">
                       <div className="hn-title-row">
-                        <a
-                          className="hn-title"
-                          href={j.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {j.title}
-                        </a>
-                        <span className="hn-domain">({j.company})</span>
+                        <span className="hn-title">{r.robot_name}</span>
+                        <span className="hn-domain">({r.maker_name})</span>
                       </div>
                       <div className="hn-meta">
-                        {j.location ? <span>{j.location}</span> : null}
-                        {j.location ? " · " : ""}
-                        {j.compensation ? <span>{j.compensation}</span> : null}
-                        {j.compensation ? " · " : ""}
-                        {j.notes ? <span>{j.notes}</span> : null}
+                        <span>Emergence: {r.emergence_date}</span> ·{" "}
+                        <span style={{ color: "#6b7280" }}>
+                          submitted{" "}
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </span>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: 12,
-                marginTop: 12,
-              }}
-            >
-              {filtered.map((j) => (
-                <a
-                  key={j.id}
-                  href={j.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: 14,
-                    background: "#fff",
-                    textDecoration: "none",
-                    color: "inherit",
-                  }}
-                >
-                  <div style={{ fontWeight: 900, marginBottom: 6 }}>
-                    {j.title}
-                  </div>
-                  <div style={{ color: "#6b7280", fontSize: 12 }}>
-                    {j.company}
-                    {j.location ? ` · ${j.location}` : ""}
-                    {j.compensation ? ` · ${j.compensation}` : ""}
-                  </div>
-                  {j.notes ? (
-                    <div
-                      style={{
-                        color: "#111827",
-                        fontSize: 12,
-                        marginTop: 10,
-                      }}
-                    >
-                      {j.notes}
-                    </div>
-                  ) : null}
-                </a>
-              ))}
-            </div>
           )}
         </main>
 
         <aside className="hn-sidebar">
           <div className="hn-sidebar-box">
-            <h4>➕ Submit a job</h4>
+            <h4>➕ Submit a robot</h4>
 
             {!session ? (
               <div className="hn-signin-prompt">
-                <p>Sign in on the submissions page to post jobs.</p>
+                <p>Sign in on the demos page to submit robots.</p>
                 <Link href={withCity("/", city.key)} className="hn-button">
                   Sign in
                 </Link>
@@ -363,26 +258,25 @@ export default function JobsClient() {
                   e.preventDefault();
                   setNotice(null);
 
-                  const u = safeUrl(formUrl.trim());
-                  if (!u) {
-                    setNotice("Job URL must be a valid https URL.");
+                  if (!robotName.trim()) {
+                    setNotice("Robot name is required.");
                     return;
                   }
-
-                  if (!formCompany.trim() || !formTitle.trim()) {
-                    setNotice("Company and title are required.");
+                  if (!makerName.trim()) {
+                    setNotice("Maker's name is required.");
+                    return;
+                  }
+                  if (!emergenceDate) {
+                    setNotice("Date of emergence is required.");
                     return;
                   }
 
                   setSubmitting(true);
-                  const { error } = await supabase.from("jobs").insert({
+                  const { error } = await supabase.from("robots").insert({
                     city: city.label,
-                    company: formCompany.trim(),
-                    title: formTitle.trim(),
-                    location: formLocation.trim() || null,
-                    url: u,
-                    compensation: formComp.trim() || null,
-                    notes: formNotes.trim() || null,
+                    robot_name: robotName.trim(),
+                    maker_name: makerName.trim(),
+                    emergence_date: emergenceDate,
                   });
                   setSubmitting(false);
 
@@ -391,81 +285,44 @@ export default function JobsClient() {
                     return;
                   }
 
-                  setFormCompany("");
-                  setFormTitle("");
-                  setFormLocation("");
-                  setFormUrl("");
-                  setFormComp("");
-                  setFormNotes("");
-                  fetchJobs();
+                  setRobotName("");
+                  setMakerName("");
+                  setEmergenceDate("");
+                  fetchRobots();
                 }}
               >
                 <label>
-                  Company
+                  Robot name
                   <input
                     className="input"
                     type="text"
-                    placeholder="Acme Co"
-                    value={formCompany}
-                    onChange={(e) => setFormCompany(e.target.value)}
+                    placeholder="Clawtron 3000"
+                    value={robotName}
+                    onChange={(e) => setRobotName(e.target.value)}
                     required
                   />
                 </label>
 
                 <label>
-                  Title
+                  Maker&apos;s name
                   <input
                     className="input"
                     type="text"
-                    placeholder="Founding engineer"
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
+                    placeholder="Ada Lovelace"
+                    value={makerName}
+                    onChange={(e) => setMakerName(e.target.value)}
                     required
                   />
                 </label>
 
                 <label>
-                  Location (optional)
+                  Date of emergence
                   <input
                     className="input"
-                    type="text"
-                    placeholder="SF / Remote"
-                    value={formLocation}
-                    onChange={(e) => setFormLocation(e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  URL
-                  <input
-                    className="input"
-                    type="text"
-                    placeholder="https://jobs..."
-                    value={formUrl}
-                    onChange={(e) => setFormUrl(e.target.value)}
+                    type="date"
+                    value={emergenceDate}
+                    onChange={(e) => setEmergenceDate(e.target.value)}
                     required
-                  />
-                </label>
-
-                <label>
-                  Compensation (optional)
-                  <input
-                    className="input"
-                    type="text"
-                    placeholder="$150k–$200k + equity"
-                    value={formComp}
-                    onChange={(e) => setFormComp(e.target.value)}
-                  />
-                </label>
-
-                <label>
-                  Notes (optional)
-                  <input
-                    className="input"
-                    type="text"
-                    placeholder="Visa, stack, team size…"
-                    value={formNotes}
-                    onChange={(e) => setFormNotes(e.target.value)}
                   />
                 </label>
 
@@ -478,18 +335,10 @@ export default function JobsClient() {
                 </button>
 
                 <p className="hn-tip" style={{ margin: 0 }}>
-                  Use a link with a clear job description.
+                  Use the emergence date (not build date). Robots deserve lore.
                 </p>
               </form>
             )}
-          </div>
-
-          <div className="hn-sidebar-box">
-            <h4>✅ Tips</h4>
-            <ul className="hn-ideas">
-              <li>Include location + remote/visa info if you can.</li>
-              <li>Use a stable URL (careers page or job post).</li>
-            </ul>
           </div>
         </aside>
       </div>

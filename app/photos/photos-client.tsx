@@ -121,6 +121,10 @@ export default function PhotosClient() {
               speakers
             </a>
             <span className="hn-nav-sep">|</span>
+            <a href={withCity("/robots", city.key)} className="hn-nav-link">
+              robots
+            </a>
+            <span className="hn-nav-sep">|</span>
             <a href={withCity("/sponsors", city.key)} className="hn-nav-link">
               sponsors
             </a>
