@@ -1,11 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
+
+type ViewMode = "grid" | "list";
+
+type LivestreamRow = {
+  id: string;
+  city: string;
+  title: string | null;
+  url: string;
+  notes: string | null;
+  created_at: string;
+};
+
+function safeUrl(s: string): string | null {
+  try {
+    const u = new URL(s);
+    if (u.protocol !== "https:") return null;
+    if (u.username || u.password) return null;
+    return u.toString();
+  } catch {
+    return null;
+  }
+}
 
 export default function LivestreamClient() {
   const router = useRouter();
@@ -28,15 +50,26 @@ export default function LivestreamClient() {
     await supabase.auth.signOut();
   };
 
-  const url = useMemo(() => city.livestreamUrl || null, [city.livestreamUrl]);
+  const defaultUrl = useMemo(
+    () => city.livestreamUrl || null,
+    [city.livestreamUrl],
+  );
 
+  const [view, setView] = useState<ViewMode>("grid");
+  const [items, setItems] = useState<LivestreamRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const [formTitle, setFormTitle] = useState("");
   const [formUrl, setFormUrl] = useState("");
   const [formNotes, setFormNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const mailtoHref = useMemo(() => {
     const subject = `Claw Con livestream link (${city.label})`;
     const bodyLines = [
       `City: ${city.label}`,
+      `Title: ${formTitle.trim() || "(none)"}`,
       `Livestream URL: ${formUrl.trim() || "(missing)"}`,
       formNotes.trim() ? `Notes: ${formNotes.trim()}` : null,
       "",
@@ -45,7 +78,51 @@ export default function LivestreamClient() {
 
     const body = bodyLines.join("\n");
     return `mailto:colin@clawdcon.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [city.label, formNotes, formUrl]);
+  }, [city.label, formNotes, formTitle, formUrl]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("clawcon.livestream.view");
+      if (stored === "list" || stored === "grid") setView(stored);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("clawcon.livestream.view", view);
+    } catch {}
+  }, [view]);
+
+  const fetchLivestreams = useCallback(async () => {
+    setLoading(true);
+    setNotice(null);
+
+    const { data, error } = await supabase
+      .from("livestreams")
+      .select("id,city,title,url,notes,created_at")
+      .eq("city", city.label)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setItems([]);
+      setNotice(
+        "Livestreams database not configured yet (missing `livestreams` table).",
+      );
+      setLoading(false);
+      return;
+    }
+
+    setItems((data as LivestreamRow[]) || []);
+    setLoading(false);
+  }, [city.label]);
+
+  useEffect(() => {
+    fetchLivestreams();
+  }, [fetchLivestreams]);
+
+  const hero = items[0] || null;
+  const heroUrl = hero?.url || defaultUrl;
+  const rest = items.slice(1);
 
   return (
     <>
@@ -165,7 +242,9 @@ export default function LivestreamClient() {
             </span>
           </div>
 
-          {url ? (
+          {notice && <div className="hn-notice">{notice}</div>}
+
+          {heroUrl ? (
             <>
               <div
                 style={{
@@ -179,7 +258,7 @@ export default function LivestreamClient() {
                 }}
               >
                 <iframe
-                  src={url}
+                  src={heroUrl}
                   title={`Claw Con ${city.label} Livestream`}
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen
@@ -188,54 +267,209 @@ export default function LivestreamClient() {
               </div>
 
               <p style={{ marginTop: 12, color: "#6b7280" }}>
-                If the embed doesn’t load, open it here: <a href={url}>{url}</a>
+                If the embed doesn’t load, open it here:{" "}
+                <a href={heroUrl} target="_blank" rel="noreferrer">
+                  {heroUrl}
+                </a>
               </p>
             </>
           ) : (
             <p style={{ marginTop: 12, color: "#6b7280" }}>
-              No livestream link added yet for {city.label}.
+              No livestreams yet for {city.label}.
             </p>
+          )}
+
+          <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+            <button
+              className="hn-button"
+              onClick={() => setView("grid")}
+              disabled={view === "grid"}
+            >
+              Grid
+            </button>
+            <button
+              className="hn-button"
+              onClick={() => setView("list")}
+              disabled={view === "list"}
+            >
+              List
+            </button>
+          </div>
+
+          {loading ? (
+            <p style={{ color: "#6b7280", marginTop: 12 }}>Loading…</p>
+          ) : rest.length === 0 ? (
+            <p style={{ color: "#6b7280", marginTop: 12 }}>
+              No additional livestreams yet.
+            </p>
+          ) : view === "list" ? (
+            <table className="hn-table" style={{ marginTop: 12 }}>
+              <tbody>
+                {rest.map((s, idx) => (
+                  <tr key={s.id} className="hn-row">
+                    <td className="hn-rank">{idx + 1}.</td>
+                    <td className="hn-content">
+                      <div className="hn-title-row">
+                        <a
+                          className="hn-title"
+                          href={s.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {s.title || "Livestream"}
+                        </a>
+                        <span className="hn-domain">({city.label})</span>
+                      </div>
+                      <div className="hn-meta">
+                        <span>{new Date(s.created_at).toLocaleString()}</span>
+                        {s.notes ? (
+                          <>
+                            {" "}
+                            · <span>{s.notes}</span>
+                          </>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gap: 12,
+                marginTop: 12,
+              }}
+            >
+              {rest.map((s) => (
+                <a
+                  key={s.id}
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 12,
+                    padding: 14,
+                    background: "#fff",
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                >
+                  <div style={{ fontWeight: 900, marginBottom: 6 }}>
+                    {s.title || "Livestream"}
+                  </div>
+                  <div style={{ color: "#6b7280", fontSize: 12 }}>
+                    {new Date(s.created_at).toLocaleString()}
+                  </div>
+                  {s.notes ? (
+                    <div
+                      style={{ color: "#111827", fontSize: 12, marginTop: 10 }}
+                    >
+                      {s.notes}
+                    </div>
+                  ) : null}
+                </a>
+              ))}
+            </div>
           )}
         </main>
 
         <aside className="hn-sidebar">
           <div className="hn-sidebar-box">
             <h3>Submit a livestream</h3>
-            <form
-              className="hn-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                window.location.href = mailtoHref;
-              }}
-            >
-              <label>
-                Livestream URL
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="https://streamyard.com/watch/..."
-                  value={formUrl}
-                  onChange={(e) => setFormUrl(e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Notes (optional)
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="Time, host, agenda, etc."
-                  value={formNotes}
-                  onChange={(e) => setFormNotes(e.target.value)}
-                />
-              </label>
-              <button className="hn-button" type="submit">
-                Email Colin
-              </button>
-              <p className="hn-tip" style={{ margin: 0 }}>
-                This opens your email client to coordinate.
-              </p>
-            </form>
+            {!session ? (
+              <div className="hn-signin-prompt">
+                <p>Sign in on the submissions page to add livestreams.</p>
+                <Link href={withCity("/", city.key)} className="hn-button">
+                  Sign in
+                </Link>
+              </div>
+            ) : (
+              <form
+                className="hn-form"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setNotice(null);
+
+                  const u = safeUrl(formUrl.trim());
+                  if (!u) {
+                    setNotice("Livestream URL must be a valid https URL.");
+                    return;
+                  }
+
+                  setSubmitting(true);
+                  const { error } = await supabase.from("livestreams").insert({
+                    city: city.label,
+                    title: formTitle.trim() || null,
+                    url: u,
+                    notes: formNotes.trim() || null,
+                  });
+                  setSubmitting(false);
+
+                  if (error) {
+                    setNotice(error.message);
+                    return;
+                  }
+
+                  setFormTitle("");
+                  setFormUrl("");
+                  setFormNotes("");
+                  fetchLivestreams();
+                }}
+              >
+                <label>
+                  Title (optional)
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Claw Con SF stream"
+                    value={formTitle}
+                    onChange={(e) => setFormTitle(e.target.value)}
+                  />
+                </label>
+                <label>
+                  Livestream URL
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="https://streamyard.com/watch/..."
+                    value={formUrl}
+                    onChange={(e) => setFormUrl(e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Notes (optional)
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Time, host, agenda, etc."
+                    value={formNotes}
+                    onChange={(e) => setFormNotes(e.target.value)}
+                  />
+                </label>
+
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button
+                    className="hn-button"
+                    type="submit"
+                    disabled={submitting}
+                  >
+                    {submitting ? "Submitting..." : "Submit"}
+                  </button>
+                  <a className="hn-button" href={mailtoHref}>
+                    Email Colin
+                  </a>
+                </div>
+
+                <p className="hn-tip" style={{ margin: 0 }}>
+                  Submit adds it to the site; email Colin to coordinate posting.
+                </p>
+              </form>
+            )}
           </div>
 
           <div className="hn-sidebar-box">
