@@ -15,7 +15,7 @@ export interface Submission {
   links: string[] | null;
   vote_count: number;
   comment_count?: number;
-  submission_type: "speaker_demo" | "topic";
+  submission_type: "speaker_demo" | "topic" | "robot";
   submitted_by: "human" | "bot" | "bot_on_behalf";
   submitted_for_name: string | null;
   is_openclaw_contributor: boolean;
