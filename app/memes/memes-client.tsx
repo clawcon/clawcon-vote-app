@@ -196,6 +196,10 @@ export default function MemesClient() {
               robots
             </a>
             <span className="hn-nav-sep">|</span>
+            <a href={withCity("/papers", city.key)} className="hn-nav-link">
+              papers
+            </a>
+            <span className="hn-nav-sep">|</span>
             <a href={withCity("/sponsors", city.key)} className="hn-nav-link">
               sponsors
             </a>
