@@ -38,7 +38,14 @@ const MONTHS = [
 
 type ViewMode = "list" | "grid";
 
-type CategoryKey = "demo-day" | "workshop" | "meetup" | "conference";
+type CategoryKey =
+  | "demo-day"
+  | "bootcamp"
+  | "focus-group"
+  | "happy-hour"
+  | "workshop"
+  | "meetup"
+  | "conference";
 
 function slugify(s: string): string {
   return s
@@ -456,6 +463,9 @@ export default function EventsClient() {
                     onChange={(e) => setCategory(e.target.value as CategoryKey)}
                   >
                     <option value="demo-day">demo-day</option>
+                    <option value="bootcamp">bootcamp</option>
+                    <option value="focus-group">focus-group</option>
+                    <option value="happy-hour">happy-hour</option>
                     <option value="meetup">meetup</option>
                     <option value="workshop">workshop</option>
                     <option value="conference">conference</option>
