@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
+import CitySidebar from "../city-sidebar";
 
 // Placeholder: add mp4 URLs here as we collect them.
 const sfVideos: string[] = [];
@@ -193,33 +194,7 @@ export default function PhotosClient() {
         </div>
       </div>
 
-      <div className="hn-city-rail" aria-label="City selector">
-        <div className="hn-city-rail-label">Cities</div>
-        <a
-          className={city.key === "san-francisco" ? "active" : ""}
-          href={withCity("/photos", "san-francisco")}
-        >
-          San Francisco
-        </a>
-        <a
-          className={city.key === "denver" ? "active" : ""}
-          href={withCity("/photos", "denver")}
-        >
-          Denver
-        </a>
-        <a
-          className={city.key === "tokyo" ? "active" : ""}
-          href={withCity("/photos", "tokyo")}
-        >
-          Tokyo
-        </a>
-        <a
-          className={city.key === "kona" ? "active" : ""}
-          href={withCity("/photos", "kona")}
-        >
-          Kona
-        </a>
-      </div>
+      <CitySidebar path="/photos" activeCityKey={city.key} />
 
       <div className="hn-layout">
         <main className="hn-main">

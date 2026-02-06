@@ -7,6 +7,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 import type { Submission } from "../lib/types";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../lib/cities";
+import CitySidebar from "./city-sidebar";
 import { sanitizeLink, getDomain, timeAgo } from "../lib/utils";
 
 export default function SubmissionBoard() {
@@ -536,33 +537,7 @@ export default function SubmissionBoard() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <div className="hn-city-rail" aria-label="City selector">
-        <div className="hn-city-rail-label">Cities</div>
-        <a
-          className={city.key === "san-francisco" ? "active" : ""}
-          href={withCity("/", "san-francisco")}
-        >
-          San Francisco
-        </a>
-        <a
-          className={city.key === "denver" ? "active" : ""}
-          href={withCity("/", "denver")}
-        >
-          Denver
-        </a>
-        <a
-          className={city.key === "tokyo" ? "active" : ""}
-          href={withCity("/", "tokyo")}
-        >
-          Tokyo
-        </a>
-        <a
-          className={city.key === "kona" ? "active" : ""}
-          href={withCity("/", "kona")}
-        >
-          Kona
-        </a>
-      </div>
+      <CitySidebar path="/" activeCityKey={city.key} />
 
       <div className="hn-layout">
         {/* Main content - submissions list */}

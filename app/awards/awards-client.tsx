@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 import { DEFAULT_CITY_KEY, getCity, withCity } from "../../lib/cities";
+import CitySidebar from "../city-sidebar";
 
 type AwardKind = "prize" | "grant" | "challenge" | "bounty";
 
@@ -228,33 +229,7 @@ export default function AwardsClient() {
 
       {notice && <div className="hn-notice">{notice}</div>}
 
-      <div className="hn-city-rail" aria-label="City selector">
-        <div className="hn-city-rail-label">Cities</div>
-        <a
-          className={city.key === "san-francisco" ? "active" : ""}
-          href={withCity("/awards", "san-francisco")}
-        >
-          San Francisco
-        </a>
-        <a
-          className={city.key === "denver" ? "active" : ""}
-          href={withCity("/awards", "denver")}
-        >
-          Denver
-        </a>
-        <a
-          className={city.key === "tokyo" ? "active" : ""}
-          href={withCity("/awards", "tokyo")}
-        >
-          Tokyo
-        </a>
-        <a
-          className={city.key === "kona" ? "active" : ""}
-          href={withCity("/awards", "kona")}
-        >
-          Kona
-        </a>
-      </div>
+      <CitySidebar path="/awards" activeCityKey={city.key} />
 
       <div className="hn-layout">
         <main className="hn-main">

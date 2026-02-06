@@ -100,17 +100,42 @@ main.root {
   gap: 10px;
 }
 
-.hn-city-rail {
+.hn-city-toggle {
   position: fixed;
   top: 70px;
-  right: 16px;
+  left: 16px;
+  z-index: 60;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hn-city-sidebar {
+  position: fixed;
+  top: 104px;
+  left: 16px;
+  width: 180px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 50;
+  z-index: 55;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-.hn-city-rail-label {
+.hn-city-sidebar.hidden {
+  display: none;
+}
+
+.hn-city-sidebar-label {
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -118,7 +143,7 @@ main.root {
   padding: 0 6px;
 }
 
-.hn-city-rail a {
+.hn-city-sidebar a {
   display: inline-block;
   padding: 6px 10px;
   border: 1px solid #e5e7eb;
@@ -127,16 +152,19 @@ main.root {
   color: #111827;
   text-decoration: none;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.hn-city-rail a.active {
+.hn-city-sidebar a.active {
   background: #ffedd5;
   border-color: #fb923c;
 }
 
 @media (max-width: 900px) {
-  .hn-city-rail {
+  .hn-city-sidebar {
+    display: none;
+  }
+  .hn-city-toggle {
     display: none;
   }
 }
