@@ -194,10 +194,6 @@ export default function LivestreamClient() {
               livestream
             </a>
             <span className="hn-nav-sep">|</span>
-            <a href={withCity("/chats", city.key)} className="hn-nav-link">
-              join the chat
-            </a>
-            <span className="hn-nav-sep">|</span>
             <a href="/skills" className="hn-nav-link">
               skills
             </a>
