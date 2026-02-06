@@ -297,7 +297,7 @@ export default function EventsClient() {
               rel="noreferrer"
               className="hn-nav-link"
             >
-              openclaw discord
+              discord
             </a>
           </nav>
           {userEmail && (

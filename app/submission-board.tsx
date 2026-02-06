@@ -515,7 +515,7 @@ export default function SubmissionBoard() {
               rel="noreferrer"
               className="hn-nav-link"
             >
-              openclaw discord
+              discord
             </a>
           </nav>
           {userEmail && (
