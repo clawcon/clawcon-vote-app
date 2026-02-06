@@ -45,6 +45,7 @@ type CategoryKey =
   | "focus-group"
   | "happy-hour"
   | "coffee"
+  | "cowork"
   | "workshop"
   | "meetup"
   | "conference";
@@ -478,6 +479,7 @@ export default function EventsClient() {
                     <option value="focus-group">focus-group</option>
                     <option value="happy-hour">happy-hour</option>
                     <option value="coffee">coffee</option>
+                    <option value="cowork">cowork</option>
                     <option value="meetup">meetup</option>
                     <option value="workshop">workshop</option>
                     <option value="conference">conference</option>
