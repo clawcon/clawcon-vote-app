@@ -8,7 +8,6 @@ type VoteRow = {
   id: string;
   created_at: string;
   submission_id: string;
-  user_id?: string | null;
 };
 
 type SubmissionRow = {
@@ -33,16 +32,25 @@ export default function LogsPage() {
   }, []);
 
   useEffect(() => {
-    // NOTE: this is an initial “ops console” view.
-    // If RLS blocks reads, we’ll swap to an admin-only RPC later.
     (async () => {
       setError(null);
 
-      const subs = await supabase
-        .from("submissions")
-        .select("id,created_at,title,presenter_name,submission_type")
-        .order("created_at", { ascending: false })
-        .limit(200);
+      // Map cityKey -> event slug (via existing constant used throughout the app)
+      // For now we derive the event slug by asking the events table.
+      const ev = await supabase
+        .from("events")
+        .select("slug")
+        .eq("slug", cityKey)
+        .maybeSingle();
+
+      // If the cityKey isn't literally the event slug, fall back to reading it from the page URL
+      // (the rest of the app uses lib/cities, but logs is intentionally simple).
+      const eventSlug = ev.data?.slug || cityKey;
+
+      const subs = await supabase.rpc("get_public_recent_submissions", {
+        _event_slug: eventSlug,
+        _limit: 200,
+      });
 
       if (subs.error) {
         setError(subs.error.message);
@@ -50,11 +58,10 @@ export default function LogsPage() {
       }
       setSubmissions((subs.data as any) || []);
 
-      const v = await supabase
-        .from("votes")
-        .select("id,created_at,submission_id,user_id")
-        .order("created_at", { ascending: false })
-        .limit(200);
+      const v = await supabase.rpc("get_public_recent_votes", {
+        _event_slug: eventSlug,
+        _limit: 200,
+      });
 
       if (v.error) {
         setError(v.error.message);
@@ -121,7 +128,7 @@ export default function LogsPage() {
                   {new Date(v.created_at).toLocaleString()}
                 </div>
                 <div className="oc-mono">{v.submission_id}</div>
-                <div className="oc-mono oc-muted">{v.user_id || "—"}</div>
+                <div className="oc-mono oc-muted">anon</div>
               </div>
             ))}
           </div>
@@ -129,8 +136,7 @@ export default function LogsPage() {
       </div>
 
       <div className="oc-muted">
-        Note: if this page is empty or errors, it’s probably RLS. Next step would
-        be an admin-only RPC (or a service-role API route) for aggregated logs.
+        Public read-only logs. Votes are anonymized.
       </div>
     </div>
   );

@@ -134,6 +134,60 @@ create policy "Authenticated can read own votes" on public.votes
   for select to authenticated
   using (auth.uid() = user_id);
 
+-- Public read-only logs (no user identity exposure)
+create or replace function public.get_public_recent_submissions(_event_slug text, _limit int default 200)
+returns table (
+  id uuid,
+  created_at timestamptz,
+  title text,
+  presenter_name text,
+  submission_type text
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    s.id,
+    s.created_at,
+    s.title,
+    s.presenter_name,
+    s.submission_type
+  from public.submissions s
+  join public.events e on e.id = s.event_id
+  where e.slug = _event_slug
+  order by s.created_at desc
+  limit greatest(0, least(_limit, 500));
+$$;
+
+grant execute on function public.get_public_recent_submissions(text, int) to anon, authenticated;
+
+create or replace function public.get_public_recent_votes(_event_slug text, _limit int default 200)
+returns table (
+  id uuid,
+  created_at timestamptz,
+  submission_id uuid
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    v.id,
+    v.created_at,
+    v.submission_id
+  from public.votes v
+  join public.submissions s on s.id = v.submission_id
+  join public.events e on e.id = s.event_id
+  where e.slug = _event_slug
+  order by v.created_at desc
+  limit greatest(0, least(_limit, 500));
+$$;
+
+grant execute on function public.get_public_recent_votes(text, int) to anon, authenticated;
+
 -- Legacy (no-arg) RPC: kept for backward compatibility
 create or replace function public.get_submissions_with_votes()
 returns table (
