@@ -40,14 +40,7 @@ export default function SubmissionBoard() {
   const [formX, setFormX] = useState("");
   const [formLinkedIn, setFormLinkedIn] = useState("");
   const [activeTab, setActiveTab] = useState<"speaker_demo" | "topic">(
-    () => {
-      try {
-        const url = new URL(window.location.href);
-        return url.searchParams.get("tab") === "topic" ? "topic" : "speaker_demo";
-      } catch {
-        return "speaker_demo";
-      }
-    },
+    "speaker_demo",
   );
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [displayCount, setDisplayCount] = useState(30);
